@@ -11,7 +11,7 @@ const getGoals = async (req, res) => {
 
 const createGoals = async (req, res) => {
 	if (!req.body.text) {
-		throw new Error('Error field undefine');
+		throw new Error('Error field undefined');
 	}
 
 	try {
@@ -22,12 +22,34 @@ const createGoals = async (req, res) => {
 	}
 };
 
-const editGoals = (req, res) => {
-	res.send('get all my goals');
+const editGoals = async (req, res) => {
+	try {
+		const goal = await Goal.findById(req.params.id);
+		if (!goal) {
+			res.status(404);
+			throw new Error('Goal not exist');
+		}
+
+		const updatedGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {
+			new: true,
+		});
+		res.status(200).json(updatedGoal);
+	} catch (error) {
+		throw new Error('Someting wrong just happened');
+	}
 };
 
-const deleteGoals = (req, res) => {
-	res.send('get all my goals');
+const deleteGoals = async (req, res) => {
+	try {
+		if (!req.params.id) {
+			throw new Error('Please provide an id');
+		}
+		const deletedGoal = await Goal.findByIdAndDelete(req.params.id);
+		res.status(200).json(deletedGoal);
+	} catch (error) {
+		res.status(500);
+		throw new Error('Someting wrong just happened');
+	}
 };
 
 module.exports = {
