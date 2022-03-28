@@ -9,19 +9,19 @@ const registerUser = async (req, res, next) => {
 			res.status(400);
 			next(new Error('Please add all field'));
 		}
-		const userFound = User.findOne({ email });
+		const userFound = await User.findOne({ email });
 		if (userFound) {
 			res.status(400);
 			next(new Error('User aleready exist'));
+		} else {
+			const salt = await bcrypt.genSalt(10);
+			const hashedPassword = await bcrypt.hash(password, salt);
+			const user = await User.create({ name, email, password: hashedPassword });
+			res.status(201).json({ _id: user.id, name, email });
 		}
-		const salt = await bcrypt.genSalt(10);
-		const hashedPassword = await bcrypt.hash(password, salt);
-		const user = await User.create({ name, email, password: hashedPassword });
-		res.status(201).json({ _id: user.id, name, email });
 	} catch (error) {
-		console.log('error', error);
 		res.status(500);
-		throw new Error(error);
+		next(new Error(error));
 	}
 };
 
