@@ -17,7 +17,8 @@ const registerUser = async (req, res, next) => {
 			const salt = await bcrypt.genSalt(10);
 			const hashedPassword = await bcrypt.hash(password, salt);
 			const user = await User.create({ name, email, password: hashedPassword });
-			res.status(201).json({ _id: user.id, name, email });
+			const token = genToken(user.id);
+			res.status(201).json({ _id: user.id, name, email, token });
 		}
 	} catch (error) {
 		res.status(500);
@@ -25,14 +26,33 @@ const registerUser = async (req, res, next) => {
 	}
 };
 
-const login = async (req, res) => {
-	const body = req.body;
+const login = async (req, res, next) => {
 	try {
-		const user = await User.findOne(body);
-		res.status(200).json(user);
-	} catch (error) {}
+		const { email, password } = req.body;
+		const user = await User.findOne({ email });
+		if (!user) {
+			res.status(404);
+			next(new Error('User Not found'));
+		} else {
+			const verifyPassword = await bcrypt.compare(password, user.password);
+			if (verifyPassword) {
+				const token = genToken(user.id);
+				res.status(200).json({ token, name: user.name });
+			} else {
+				res.status(400);
+				next(new Error('Invalid user'));
+			}
+		}
+	} catch (error) {
+		next(new Error(error));
+	}
 };
 
+const genToken = (payload) => {
+	return jwt.sign({ _id: payload }, '6kwèt', {
+		expiresIn: '2h',
+	});
+};
 const getUser = async (req, res) => {
 	const body = req.body;
 	try {
