@@ -58,8 +58,8 @@ const genToken = (payload) => {
 const getUser = async (req, res) => {
 	const body = req.body;
 	try {
-		const user = await User.find();
-		res.status(200).json(user);
+		//const user = await User.find();
+		res.status(200).json(req.user);
 	} catch (error) {}
 };
 
