@@ -30,6 +30,7 @@ const login = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
 		const user = await User.findOne({ email });
+		console.log('Login', user.id);
 		if (!user) {
 			res.status(404);
 			next(new Error('User Not found'));
@@ -49,10 +50,11 @@ const login = async (req, res, next) => {
 };
 
 const genToken = (payload) => {
-	return jwt.sign({ _id: payload }, '6kwèt', {
+	return jwt.sign({ _id: payload }, process.env.SECRETE, {
 		expiresIn: '2h',
 	});
 };
+
 const getUser = async (req, res) => {
 	const body = req.body;
 	try {
