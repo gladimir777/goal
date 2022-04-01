@@ -1,4 +1,3 @@
-const erroHandler = require('../midleware/errorMidleware');
 const Goal = require('../models/goalModel');
 const User = require('../models/userModel');
 
@@ -68,9 +67,9 @@ const deleteGoals = async (req, res, next) => {
 			next(Error('Please provide an id'));
 		}
 		const { user } = req;
-		console.log('user', user);
+
 		const goal = await Goal.findById(id).select('-pasword');
-		console.log('Goal', goal);
+
 		if (!goal) {
 			res.status(404);
 			next(new Error('Goal not found'));
@@ -85,7 +84,7 @@ const deleteGoals = async (req, res, next) => {
 		}
 	} catch (error) {
 		res.status(500);
-		throw new Error('Someting wrong just happened');
+		next(new Error('Someting wrong just happened'));
 	}
 };
 
