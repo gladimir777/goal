@@ -60,13 +60,29 @@ const editGoals = async (req, res, next) => {
 	}
 };
 
-const deleteGoals = async (req, res) => {
+const deleteGoals = async (req, res, next) => {
+	let { id } = req.params;
 	try {
-		if (!req.params.id) {
-			throw new Error('Please provide an id');
+		if (!id) {
+			res.status(400);
+			next(Error('Please provide an id'));
 		}
-		const deletedGoal = await Goal.findByIdAndDelete(req.params.id);
-		res.status(200).json(deletedGoal);
+		const { user } = req;
+		console.log('user', user);
+		const goal = await Goal.findById(id).select('-pasword');
+		console.log('Goal', goal);
+		if (!goal) {
+			res.status(404);
+			next(new Error('Goal not found'));
+		}
+
+		if (user.id == goal.user) {
+			const deletedGoal = await Goal.findByIdAndDelete(req.params.id);
+			res.status(200).json({ message: 'Goal deleted with success' });
+		} else {
+			res.status(401);
+			next(new Error('Not authorized'));
+		}
 	} catch (error) {
 		res.status(500);
 		throw new Error('Someting wrong just happened');
