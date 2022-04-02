@@ -56,10 +56,10 @@ const genToken = (payload) => {
 };
 
 const getUser = async (req, res) => {
-	const body = req.body;
+	const { user } = req.body;
 	try {
 		//const user = await User.find();
-		res.status(200).json(req.user);
+		res.status(200).json(user);
 	} catch (error) {}
 };
 
