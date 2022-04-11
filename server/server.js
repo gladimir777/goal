@@ -14,6 +14,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/goals', goalsRoute);
-app.use('/api/users', userRoute);
+app.use('/api/users/', userRoute);
 app.use(erroHandler);
 app.listen(PORT, () => console.log('server listen to port '.green + PORT));
