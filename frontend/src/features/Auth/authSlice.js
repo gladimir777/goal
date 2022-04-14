@@ -13,6 +13,16 @@ const registerUser = async (userData) => {
 
 	return res.data;
 };
+
+const logOut = async () => {
+	localStorage.removeItem('user');
+};
+
+export const _logOut = createAsyncThunk('auth/logout', async () => {
+	try {
+		await logOut();
+	} catch (error) {}
+});
 export const register = createAsyncThunk(
 	'auth/register',
 	async (user, thunkApi) => {
@@ -66,7 +76,8 @@ const authSlice = createSlice({
 				state.isLoading = false;
 				state.isSuccess = false;
 				state.message = action.paylaod;
-			});
+			})
+			.addCase(_logOut.fulfilled, (state) => (state.user = null));
 	},
 });
 
